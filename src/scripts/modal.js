@@ -2,7 +2,7 @@
 
 // Node List с попапами
 
-export const popups = document.querySelectorAll('.popup');
+const popups = document.querySelectorAll('.popup');
 
 // Функция открытия попапа
 
