@@ -4,27 +4,20 @@
 
 export const templateElement = document.querySelector('#card-template').content;
 
-// Функция обработчика лайка
-
-export function like (event) {
-  event.target.classList.toggle('card__like-button_is-active');
-}
-
-// @todo: Функция удаления карточки
-
-export function removeCard (event) {
-  event.target.closest('.card').remove();
-}
-
 // @todo: Функция создания карточки
 
-export function createCard (cardObject, likeFunc, imageFunc, removeFunc) {
+export function createCard (cardObject, likeFunc, imageFunc, removeFunc, userID) {
   const cardContainer = templateElement.querySelector('.card').cloneNode(true);
   const cardImageElement = cardContainer.querySelector('.card__image');
   const cardTitleElement = cardContainer.querySelector('.card__title');
   const cardRemoveButton = cardContainer.querySelector('.card__delete-button');
-  const likeButton = cardContainer.querySelector('.card__like-button');
-  // Сравнивать по элементу, а не списку классов не получится из-за того, что элементы likeButton и cardRemoveButton будут равны
+  const cardLike = cardContainer.querySelector('.card__like');
+  const likeButton = cardLike.querySelector('.card__like-button');
+  const likeCountElem = cardLike.querySelector('.card__like-count');
+
+  disableRemovingOtherCards(cardRemoveButton, userID, cardObject.owner._id);
+  setLiked(likeButton, checkLike(cardObject, userID));
+
   const elems = {
       [cardImageElement.classList[0]]: imageFunc,
       [likeButton.classList[0]]: likeFunc,
@@ -34,12 +27,37 @@ export function createCard (cardObject, likeFunc, imageFunc, removeFunc) {
   cardImageElement.src = cardObject.link;
   cardImageElement.alt = cardObject.name;
   cardTitleElement.textContent = cardObject.name;
+  likeCountElem.textContent = cardObject.likes.length;
   cardContainer.addEventListener('click', (event) => {
       const elem = elems[event.target.classList[0]];
       if (elem) {
-        elem(event);
+        elem({
+          'event': event,
+          'cardObject': cardObject,
+          'likeCount': likeCountElem,
+          'checkLike': checkLike,
+          'userID': userID
+        });
       }
   });
 
   return cardContainer;
+}
+
+function checkLike (cardObject, userID) {
+  return cardObject.likes.some((like) => {
+    return like._id === userID;
+  });
+}
+
+function setLiked (likeButton, isLiked) {
+  if (isLiked) {
+    likeButton.classList.add('card__like-button_is-active');
+  }
+}
+
+function disableRemovingOtherCards (cardRemoveButton, userID, creatorID) {
+  if (creatorID !== userID) {
+    cardRemoveButton.remove();
+  }
 }
