@@ -1,5 +1,7 @@
 "use strict";
 
+import { deleteCard, sendLike, deleteLike } from './api.js';
+
 // @todo: Темплейт карточки
 
 export const templateElement = document.querySelector('#card-template').content;
@@ -41,6 +43,35 @@ export function createCard (cardObject, likeFunc, imageFunc, removeFunc, userID)
   });
 
   return cardContainer;
+}
+
+export function removeCard (cardConfig) {
+  deleteCard(cardConfig)
+    .then(res => {
+      cardConfig.event.target.closest('.card').remove();
+    });
+}
+
+export function likeCard (cardConfig) {
+  let cardObject = cardConfig.cardObject;
+  const cardID = cardObject._id;
+  const isLiked = cardConfig.isLiked;
+  const likeCountElem = cardConfig.likeCount;
+  const likeElem = cardConfig.event.target;
+
+  if (isLiked) {
+    deleteLike(cardID, likeCountElem, likeElem)
+      .then((result) => {
+        likeElem.classList.remove('card__like-button_is-active');
+        likeCountElem.textContent = result.likes.length;
+      });
+  } else {
+    sendLike(cardID, likeCountElem, likeElem)
+      .then((result) => {
+        likeElem.classList.add('card__like-button_is-active');
+        likeCountElem.textContent = result.likes.length;
+      });
+  }
 }
 
 function checkLikedClass (likeElem) {

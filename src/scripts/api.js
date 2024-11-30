@@ -46,8 +46,8 @@ const cardsDataPromise = fetch(config.baseUrl+'/cards', {
         console.log(err); 
     });
 
-export function sendUserData (userName, userAbout, setFunc) {
-    fetch(config.baseUrl+'/users/me', {
+export function sendUserData (userName, userAbout) {
+    return fetch(config.baseUrl+'/users/me', {
         method: 'PATCH',
         headers: config.headers,
         body: JSON.stringify({
@@ -60,8 +60,8 @@ export function sendUserData (userName, userAbout, setFunc) {
             return res.json();
         }
     })
-    .then(res => {
-        setFunc(res.name, res.about);
+    .catch((err) => {
+        console.log(err); 
     });
 }
 
@@ -81,14 +81,13 @@ export function sendNewCard (cardName, cardLink) {
 
             return Promise.reject(`Ошибка: ${res.status}`);
         })
-        .then((result) => result)
         .catch((err) => {
             console.log(err); 
         });;
 }
 
-export function deleteCard (card) {
-    fetch(config.baseUrl+`/cards/${card.cardObject._id}`, {
+export function deleteCard (cardConfig) {
+    return fetch(config.baseUrl+`/cards/${cardConfig.cardObject._id}`, {
         method: "DELETE",
         headers: {
             authorization: config.headers.authorization
@@ -96,32 +95,18 @@ export function deleteCard (card) {
     })
         .then((res) => {
             if (res.ok) {
-                card.event.target.closest('.card').remove();
+                return res.json();
             }
 
             return Promise.reject(`Ошибка: ${res.status}`);
         })
         .catch((err) => {
             console.log(err); 
-        });;
+        });
 }
 
-export function likeCard (card) {
-    let cardObject = card.cardObject;
-    const cardID = cardObject._id;
-    const isLiked = card.isLiked;
-    const likeCountElem = card.likeCount;
-    const likeElem = card.event.target;
-
-    if (isLiked) {
-        deleteLike(cardID, likeCountElem, likeElem);
-    } else {
-        sendLike(cardID, likeCountElem, likeElem);
-    }
-}
-
-function sendLike(cardID, likeCountElem, likeButton) {
-    fetch(config.baseUrl+`/cards/likes/${cardID}`, {
+export function sendLike(cardID, likeCountElem, likeButton) {
+    return fetch(config.baseUrl+`/cards/likes/${cardID}`, {
         method: 'PUT',
         headers: {
             authorization: config.headers.authorization
@@ -134,17 +119,13 @@ function sendLike(cardID, likeCountElem, likeButton) {
 
             return Promise.reject(`Ошибка: ${res.status}`);
         })
-        .then((result) => {
-            likeButton.classList.add('card__like-button_is-active');
-            likeCountElem.textContent = result.likes.length;
-        })
         .catch((err) => {
             console.log(err); 
-        });;
+        });
 }
 
-function deleteLike(cardID, likeCountElem, likeButton) {
-    fetch(config.baseUrl+`/cards/likes/${cardID}`, {
+export function deleteLike(cardID, likeCountElem, likeButton) {
+    return fetch(config.baseUrl+`/cards/likes/${cardID}`, {
         method: 'DELETE',
         headers: {
             authorization: config.headers.authorization
@@ -157,13 +138,9 @@ function deleteLike(cardID, likeCountElem, likeButton) {
 
             return Promise.reject(`Ошибка: ${res.status}`);
         })
-        .then((result) => {
-            likeButton.classList.remove('card__like-button_is-active');
-            likeCountElem.textContent = result.likes.length;
-        })
         .catch((err) => {
             console.log(err); 
-        });;
+        });
 }
 
 export function sendAvatarLink (link) {
@@ -181,10 +158,9 @@ export function sendAvatarLink (link) {
 
             return Promise.reject(`Ошибка: ${res.status}`);
         })
-        .then(res => res)
         .catch((err) => {
             console.log(err); 
-        });;
+        });
 }
 
 export const apiPromises = [ profileDataPromise, cardsDataPromise ];

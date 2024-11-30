@@ -1,8 +1,8 @@
 import '../pages/index.css';
-import { createCard} from './card.js';
+import { createCard, removeCard, likeCard } from './card.js';
 import { openModal, closeModal } from './modal.js';
 import { enableValidation, clearValidation } from './validation.js';
-import { apiPromises, sendUserData, sendNewCard, deleteCard, likeCard, sendAvatarLink } from './api.js';
+import { apiPromises, sendUserData, sendNewCard, sendAvatarLink } from './api.js';
 
 // @todo: DOM узлы
 
@@ -104,7 +104,7 @@ function addCardByForm (event) {
 
     sendNewCard(placeNameInput.value, linkInput.value)
         .then(cardObject => {
-            placeListElement.prepend(createCard(cardObject, likeCard, openImageModal, deleteCard, cardObject.owner._id));
+            placeListElement.prepend(createCard(cardObject, likeCard, openImageModal, removeCard, cardObject.owner._id));
             button.textContent = 'Сохранить';
         });
 
@@ -121,7 +121,10 @@ function editProfileSubmit (event) {
     const profileNameText = profileFormNameInput.value;
     const profileDescriptionText = profileFormDescriptionInput.value;
     
-    sendUserData(profileNameText, profileDescriptionText, setProfileText);
+    sendUserData(profileNameText, profileDescriptionText)
+        .then(res => {
+            setProfileText(res.name, res.about);
+        });
 
     closeModal(popupTypeEdit);
 }
@@ -161,7 +164,7 @@ function setProfileData (profileData) {
 
 function addCards(initialCards, userID) {
     initialCards.forEach(function (cardObject) {
-        placeListElement.append(createCard(cardObject, likeCard, openImageModal, deleteCard, userID));
+        placeListElement.append(createCard(cardObject, likeCard, openImageModal, removeCard, userID));
     });
 }
 

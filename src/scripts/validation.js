@@ -29,7 +29,6 @@ export function clearValidation (profileForm, validationConfig) {
 function inputValidation (input, inputErrorClass, errorClass) {
     const errorElem = getErrorElem(input.id);
     const message = getErrorMessage(input);
-    console.log(errorClass);
     
     if(!input.validity.valid) {
         showError(errorElem, message, errorClass, input, inputErrorClass);
