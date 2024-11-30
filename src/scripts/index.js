@@ -18,6 +18,8 @@ const addButton = document.querySelector('.profile__add-button');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 const popupTypeImage = document.querySelector('.popup_type_image');
+const popupImage = popupTypeImage.querySelector('.popup__image');
+const popupCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeAvatar = document.querySelector('.popup_type_avatar');
 
 // Элементы формы добавления карточки
@@ -66,8 +68,6 @@ function openAddModal () {
 
 function openImageModal (card) {
     openModal(popupTypeImage);
-    const popupImage = popupTypeImage.querySelector('.popup__image');
-    const popupCaption = popupTypeImage.querySelector('.popup__caption');
 
     popupImage.src = card.event.target.src;
     popupCaption.textContent = card.event.target.alt;
@@ -106,11 +106,14 @@ function addCardByForm (event) {
         .then(cardObject => {
             placeListElement.prepend(createCard(cardObject, likeCard, openImageModal, removeCard, cardObject.owner._id));
             button.textContent = 'Сохранить';
+            cardAddForm.reset();
+            closeModal(popupTypeNewCard);
+        })
+        .catch((err) => {
+            console.log(err); 
         });
 
-    cardAddForm.reset();
     clearValidation(cardAddForm, validationConfig);
-    closeModal(popupTypeNewCard);
 }
 
 // Обработчик событий формы редактирования профиля
@@ -124,9 +127,12 @@ function editProfileSubmit (event) {
     sendUserData(profileNameText, profileDescriptionText)
         .then(res => {
             setProfileText(res.name, res.about);
+            closeModal(popupTypeEdit);
+        })
+        .catch((err) => {
+            console.log(err); 
         });
 
-    closeModal(popupTypeEdit);
 }
 
 // Обработчик событий формы добавления аватара
@@ -139,11 +145,15 @@ function changeAvatar (event) {
     sendAvatarLink(avatarLinkInput.value)
         .then((res) => {
             setProfileData(res);
+            closeModal(popupTypeAvatar);
+            avatarForm.reset();
+        })
+        .catch((err) => {
+            console.log(err); 
+        })
+        .finally(() => {
             button.textContent = 'Сохранить';
         });
-
-    closeModal(popupTypeAvatar);
-    avatarForm.reset();
 }
 
 // Функция установки текстовых данных пользователя, отображаемых на странице
@@ -189,9 +199,10 @@ enableValidation(validationConfig);
 // Обработка промиса данных пользователя
 
 Promise.all(apiPromises)
-    .then((res) => {
-        const profileData = res[0];
-        const cardsData = res[1];
+    .then(([profileData, cardsData]) => {
         setProfileData(profileData);
         addCards(cardsData, profileData._id);
+    })
+    .catch((err) => {
+        console.log(err); 
     });

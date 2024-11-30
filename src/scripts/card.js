@@ -46,9 +46,12 @@ export function createCard (cardObject, likeFunc, imageFunc, removeFunc, userID)
 }
 
 export function removeCard (cardConfig) {
-  deleteCard(cardConfig)
+  deleteCard(cardConfig.cardObject._id)
     .then(res => {
       cardConfig.event.target.closest('.card').remove();
+    })
+    .catch((err) => {
+      console.log(err); 
     });
 }
 
@@ -64,12 +67,18 @@ export function likeCard (cardConfig) {
       .then((result) => {
         likeElem.classList.remove('card__like-button_is-active');
         likeCountElem.textContent = result.likes.length;
+      })
+      .catch((err) => {
+        console.log(err); 
       });
   } else {
     sendLike(cardID, likeCountElem, likeElem)
       .then((result) => {
         likeElem.classList.add('card__like-button_is-active');
         likeCountElem.textContent = result.likes.length;
+      })
+      .catch((err) => {
+        console.log(err); 
       });
   }
 }

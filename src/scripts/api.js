@@ -14,17 +14,7 @@ const profileDataPromise = fetch(config.baseUrl+'/users/me', {
         }
     })
         .then(res => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .then((result) =>  {
-            return result;
-        })
-        .catch((err) => {
-            console.log(err); 
+            return checkResponseStatus(res);
         });
 
 const cardsDataPromise = fetch(config.baseUrl+'/cards', {
@@ -33,18 +23,16 @@ const cardsDataPromise = fetch(config.baseUrl+'/cards', {
     }
 })
     .then(res => {
-        if (res.ok) {
-            return res.json()
-        }
-
-        return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((result) => {
-        return result;
-    })
-    .catch((err) => {
-        console.log(err); 
+        return checkResponseStatus(res);
     });
+
+function checkResponseStatus (res) {
+    if (res.ok) {
+        return res.json()
+    }
+
+    return Promise.reject(`Ошибка: ${res.status}`);
+}
 
 export function sendUserData (userName, userAbout) {
     return fetch(config.baseUrl+'/users/me', {
@@ -56,12 +44,7 @@ export function sendUserData (userName, userAbout) {
         })
     })
     .then(res => {
-        if (res.ok) {
-            return res.json();
-        }
-    })
-    .catch((err) => {
-        console.log(err); 
+        return checkResponseStatus(res);
     });
 }
 
@@ -75,37 +58,23 @@ export function sendNewCard (cardName, cardLink) {
         })
     })
         .then((res) => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .catch((err) => {
-            console.log(err); 
-        });;
+            return checkResponseStatus(res);
+        });
 }
 
-export function deleteCard (cardConfig) {
-    return fetch(config.baseUrl+`/cards/${cardConfig.cardObject._id}`, {
+export function deleteCard (cardID) {
+    return fetch(config.baseUrl+`/cards/${cardID}`, {
         method: "DELETE",
         headers: {
             authorization: config.headers.authorization
         }
     })
         .then((res) => {
-            if (res.ok) {
-                return res.json();
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .catch((err) => {
-            console.log(err); 
+            return checkResponseStatus(res);
         });
 }
 
-export function sendLike(cardID, likeCountElem, likeButton) {
+export function sendLike(cardID) {
     return fetch(config.baseUrl+`/cards/likes/${cardID}`, {
         method: 'PUT',
         headers: {
@@ -113,18 +82,11 @@ export function sendLike(cardID, likeCountElem, likeButton) {
         }
     })
         .then(res => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .catch((err) => {
-            console.log(err); 
+            return checkResponseStatus(res);
         });
 }
 
-export function deleteLike(cardID, likeCountElem, likeButton) {
+export function deleteLike(cardID) {
     return fetch(config.baseUrl+`/cards/likes/${cardID}`, {
         method: 'DELETE',
         headers: {
@@ -132,14 +94,7 @@ export function deleteLike(cardID, likeCountElem, likeButton) {
         }
     })
         .then(res => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .catch((err) => {
-            console.log(err); 
+            return checkResponseStatus(res);
         });
 }
 
@@ -152,14 +107,7 @@ export function sendAvatarLink (link) {
         })
     })
         .then(res => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-        .catch((err) => {
-            console.log(err); 
+            return checkResponseStatus(res);
         });
 }
 
