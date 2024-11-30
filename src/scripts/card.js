@@ -35,13 +35,16 @@ export function createCard (cardObject, likeFunc, imageFunc, removeFunc, userID)
           'event': event,
           'cardObject': cardObject,
           'likeCount': likeCountElem,
-          'checkLike': checkLike,
-          'userID': userID
+          'isLiked': checkLikedClass(likeButton)
         });
       }
   });
 
   return cardContainer;
+}
+
+function checkLikedClass (likeElem) {
+  return likeElem.classList.contains('card__like-button_is-active');
 }
 
 function checkLike (cardObject, userID) {
