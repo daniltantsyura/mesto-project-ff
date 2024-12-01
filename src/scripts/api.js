@@ -13,18 +13,14 @@ const profileDataPromise = fetch(config.baseUrl+'/users/me', {
             authorization: config.headers.authorization
         }
     })
-        .then(res => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 
 const cardsDataPromise = fetch(config.baseUrl+'/cards', {
     headers: {
         authorization: config.headers.authorization
     }
 })
-    .then(res => {
-        return checkResponseStatus(res);
-    });
+    .then(checkResponseStatus);
 
 function checkResponseStatus (res) {
     if (res.ok) {
@@ -43,9 +39,7 @@ export function sendUserData (userName, userAbout) {
             about: userAbout
         })
     })
-    .then(res => {
-        return checkResponseStatus(res);
-    });
+    .then(checkResponseStatus);
 }
 
 export function sendNewCard (cardName, cardLink) {
@@ -57,9 +51,7 @@ export function sendNewCard (cardName, cardLink) {
             link: cardLink
         })
     })
-        .then((res) => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 }
 
 export function deleteCard (cardID) {
@@ -69,9 +61,7 @@ export function deleteCard (cardID) {
             authorization: config.headers.authorization
         }
     })
-        .then((res) => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 }
 
 export function sendLike(cardID) {
@@ -81,9 +71,7 @@ export function sendLike(cardID) {
             authorization: config.headers.authorization
         }
     })
-        .then(res => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 }
 
 export function deleteLike(cardID) {
@@ -93,9 +81,7 @@ export function deleteLike(cardID) {
             authorization: config.headers.authorization
         }
     })
-        .then(res => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 }
 
 export function sendAvatarLink (link) {
@@ -106,9 +92,7 @@ export function sendAvatarLink (link) {
             avatar: link
         })
     })
-        .then(res => {
-            return checkResponseStatus(res);
-        });
+        .then(checkResponseStatus);
 }
 
 export const apiPromises = [ profileDataPromise, cardsDataPromise ];

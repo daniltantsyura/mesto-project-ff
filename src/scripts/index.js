@@ -21,6 +21,7 @@ const popupTypeImage = document.querySelector('.popup_type_image');
 const popupImage = popupTypeImage.querySelector('.popup__image');
 const popupCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeAvatar = document.querySelector('.popup_type_avatar');
+const popupTypeRemove = document.querySelector('.popup_type_remove');
 
 // Элементы формы добавления карточки
 
@@ -38,6 +39,14 @@ const profileFormDescriptionInput = editProfileForm.description;
 
 const avatarForm = document.forms.avatar;
 const avatarLinkInput = avatarForm.link;
+
+// Элемент формы подтверждения удаления карточки
+
+const cardRemovalForm = document.forms.remove;
+
+// Объект с информацией о выбранной для удаления карточке
+
+let currentRemovingCard = {};
 
 // Элементы профиля
 
@@ -66,11 +75,11 @@ function openAddModal () {
 
 // Функция открытия попапа с картинкой
 
-function openImageModal (card) {
+function openImageModal (event) {
     openModal(popupTypeImage);
 
-    popupImage.src = card.event.target.src;
-    popupCaption.textContent = card.event.target.alt;
+    popupImage.src = event.target.src;
+    popupCaption.textContent = event.target.alt;
 }
 
 // Функция открытия попапа редактирования профиля
@@ -86,6 +95,13 @@ function openAvatarModal () {
     openModal(popupTypeAvatar);
 }
 
+// Функция открытия попапа удаления карточки
+
+function openRemoveModal (cardContainer, cardID) {
+    openModal(popupTypeRemove);
+    currentRemovingCard.cardContainer = cardContainer;
+    currentRemovingCard.cardID = cardID;
+}
 
 // Функция заполнения формы редактирования профиля
 
@@ -104,7 +120,7 @@ function addCardByForm (event) {
 
     sendNewCard(placeNameInput.value, linkInput.value)
         .then(cardObject => {
-            placeListElement.prepend(createCard(cardObject, likeCard, openImageModal, removeCard, cardObject.owner._id));
+            placeListElement.prepend(createCard(cardObject, likeCard, openImageModal, openRemoveModal, cardObject.owner._id));
             button.textContent = 'Сохранить';
             cardAddForm.reset();
             closeModal(popupTypeNewCard);
@@ -132,7 +148,6 @@ function editProfileSubmit (event) {
         .catch((err) => {
             console.log(err); 
         });
-
 }
 
 // Обработчик событий формы добавления аватара
@@ -156,6 +171,15 @@ function changeAvatar (event) {
         });
 }
 
+// Обработчик событий формы подтверждения удаления карточки
+
+function removalSubmit (event) {
+    event.preventDefault();
+    removeCard(currentRemovingCard.cardContainer, currentRemovingCard.cardID);
+    currentRemovingCard = {};
+    closeModal(popupTypeRemove);
+}
+
 // Функция установки текстовых данных пользователя, отображаемых на странице
 
 function setProfileText (profileName, profileDescription) {
@@ -174,7 +198,7 @@ function setProfileData (profileData) {
 
 function addCards(initialCards, userID) {
     initialCards.forEach(function (cardObject) {
-        placeListElement.append(createCard(cardObject, likeCard, openImageModal, removeCard, userID));
+        placeListElement.append(createCard(cardObject, likeCard, openImageModal, openRemoveModal, userID));
     });
 }
 
@@ -191,6 +215,7 @@ profileAvatar.addEventListener('click', openAvatarModal);
 editProfileForm.addEventListener('submit', editProfileSubmit);
 cardAddForm.addEventListener('submit', addCardByForm);
 avatarForm.addEventListener('submit', changeAvatar);
+cardRemovalForm.addEventListener('submit', removalSubmit);
 
 // Вызов функции включения валидации форм
 

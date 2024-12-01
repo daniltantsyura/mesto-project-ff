@@ -17,50 +17,43 @@ export function createCard (cardObject, likeFunc, imageFunc, removeFunc, userID)
   const likeButton = cardLike.querySelector('.card__like-button');
   const likeCountElem = cardLike.querySelector('.card__like-count');
 
+  setCardData (cardImageElement, cardTitleElement, likeCountElem, cardObject.link, cardObject.name, cardObject.likes);
   disableRemovingOtherCards(cardRemoveButton, userID, cardObject.owner._id);
   setLiked(likeButton, checkLike(cardObject, userID));
 
-  const elems = {
-      [cardImageElement.classList[0]]: imageFunc,
-      [likeButton.classList[0]]: likeFunc,
-      [cardRemoveButton.classList[0]]: removeFunc
-  }
+  likeButton.addEventListener('click', (event) => {
+    likeFunc(event, cardObject, likeCountElem, checkLikedClass(likeButton));
+  });
 
-  cardImageElement.src = cardObject.link;
-  cardImageElement.alt = cardObject.name;
-  cardTitleElement.textContent = cardObject.name;
-  likeCountElem.textContent = cardObject.likes.length;
-  cardContainer.addEventListener('click', (event) => {
-      const elem = elems[event.target.classList[0]];
-      if (elem) {
-        elem({
-          'event': event,
-          'cardObject': cardObject,
-          'likeCount': likeCountElem,
-          'isLiked': checkLikedClass(likeButton)
-        });
-      }
+  cardImageElement.addEventListener('click', imageFunc);
+
+  cardRemoveButton.addEventListener('click', () => {
+    removeFunc(cardContainer, cardObject._id);
   });
 
   return cardContainer;
 }
 
-export function removeCard (cardConfig) {
-  deleteCard(cardConfig.cardObject._id)
+function setCardData (imageElem, titleElem, likeCountElem, link, name, likes) {
+  imageElem.src = link;
+  imageElem.alt = name;
+  titleElem.textContent = name;
+  likeCountElem.textContent = likes.length;
+}
+
+export function removeCard (cardElem, cardID) {
+  deleteCard(cardID)
     .then(res => {
-      cardConfig.event.target.closest('.card').remove();
+      cardElem.closest('.card').remove();
     })
     .catch((err) => {
       console.log(err); 
     });
 }
 
-export function likeCard (cardConfig) {
-  let cardObject = cardConfig.cardObject;
+export function likeCard (event, cardObject, likeCountElem, isLiked) {
   const cardID = cardObject._id;
-  const isLiked = cardConfig.isLiked;
-  const likeCountElem = cardConfig.likeCount;
-  const likeElem = cardConfig.event.target;
+  const likeElem = event.target;
 
   if (isLiked) {
     deleteLike(cardID, likeCountElem, likeElem)
